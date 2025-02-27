@@ -9,27 +9,43 @@ body {
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 30px; /* Espacio entre secciones */
     max-width: 900px;
     margin: auto;
+    align-items: start; /* Asegura alineación superior */
 }
 
 .offer, .available {
     background: white;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    height: 500px; /* Ambas secciones con la misma altura */
+    display: flex;
+    flex-direction: column;
+}
+
+.offer {
+    margin-bottom: 20px; /* Más espacio debajo del formulario */
+    padding-right: 40px;
+}
+
+.available {
+    position: sticky;
+    top: 20px; /* Fijo en la pantalla al hacer scroll */
+    overflow-y: auto;
 }
 
 h2 {
     text-align: center;
     color: #C00; /* Rojo Oracle */
+    margin-bottom: 15px;
 }
 
 form input, form button {
     width: 100%;
     padding: 10px;
-    margin: 8px 0;
+    margin: 12px 0; /* Más espacio entre el input y el botón */
     border: 1px solid #ddd;
     border-radius: 5px;
 }
@@ -40,6 +56,8 @@ button {
     border: none;
     cursor: pointer;
     font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 button:hover {
@@ -49,6 +67,7 @@ button:hover {
 ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 li {
@@ -62,19 +81,46 @@ li {
     align-items: flex-start;
 }
 
-.join-button, .delete-button {
-    background-color: #0071BC; /* Azul Oracle */
+.join-button {
+    background-color: #28a745; /* Verde */
+    color: white;
     padding: 5px 10px;
     font-size: 14px;
     margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.join-button:hover {
+    background-color: #218838; /* Verde más oscuro */
 }
 
 .delete-button {
     background-color: #C00; /* Rojo Oracle */
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #900; /* Rojo más oscuro */
 }
 
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
+    }
+    
+    .offer, .available {
+        height: auto; /* Para que en móvil no se vean forzados a una altura fija */
+    }
+
+    .available {
+        position: relative; /* Para que en móvil no quede fijo */
     }
 }

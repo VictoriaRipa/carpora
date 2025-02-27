@@ -1,113 +1,114 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const carpoolForm = document.getElementById('carpoolForm');
-    const carpoolList = document.getElementById('list');
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
-    loadCarpools();
+// Configuración de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyBYmNSuy_3nzBaz_RqB-cP40vg97XpozCU",
+    authDomain: "carpooling-79a41.firebaseapp.com",
+    databaseURL: "https://carpooling-79a41-default-rtdb.firebaseio.com",
+    projectId: "carpooling-79a41",
+    storageBucket: "carpooling-79a41.appspot.com",
+    messagingSenderId: "394767696944",
+    appId: "1:394767696944:web:f26716deec1cdf96ce19f5"
+};
 
-    carpoolForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const name = document.getElementById('name').value;
-        const location = document.getElementById('location').value; // Desde dónde sale
-        const contact = document.getElementById('contact').value;
-        const date = document.getElementById('date').value;
-        const time = document.getElementById('time').value;
-        const seats = parseInt(document.getElementById('seats').value);
+// Inicializar Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
 
-        const newCarpool = {
-            driver: name,
-            location,
-            contact,
-            date,
-            time,
-            seats,
-            passengers: []
-        };
+// Función para agregar un viaje
+function agregarViaje() {
+    const viaje = {
+        nombre: document.getElementById("name").value,
+        salida: document.getElementById("location").value,
+        contacto: document.getElementById("contact").value,
+        fecha: document.getElementById("date").value,
+        hora: document.getElementById("time").value,
+        lugares: parseInt(document.getElementById("seats").value),
+        pasajeros: [] // Agregar lista de pasajeros vacía
+    };
 
-        saveCarpool(newCarpool);
-        renderCarpool(newCarpool);
-        carpoolForm.reset();
+    // Agregar el viaje a Firebase
+    push(ref(database, 'viajes/'), viaje).then(() => {
+        document.getElementById("carpoolForm").reset(); // Limpiar formulario
+    }).catch((error) => {
+        console.error("Error al agregar el viaje:", error);
     });
+}
 
-    function saveCarpool(carpool) {
-        let carpools = JSON.parse(localStorage.getItem('carpools')) || [];
-        carpools.push(carpool);
-        localStorage.setItem('carpools', JSON.stringify(carpools));
-    }
+// Función para mostrar viajes
+function mostrarViajes() {
+    const viajesList = document.getElementById('list');
+    viajesList.innerHTML = '';
 
-    function loadCarpools() {
-        let carpools = JSON.parse(localStorage.getItem('carpools')) || [];
-        carpools.forEach(carpool => renderCarpool(carpool));
-    }
-
-    function renderCarpool(carpool) {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `<strong>${carpool.driver}</strong> - Desde: ${carpool.location} <br>
-            📅 ${carpool.date} | ⏰ ${carpool.time} <br>
-            📞 Contacto: ${carpool.contact} <br>
-            🚘 Lugares: <span class="seats">${carpool.seats}</span>
-            <button class="join-button">Unirse</button>
-            <button class="delete-button">Eliminar</button>
-            <div class="passengers"></div>`;
-
-        const passengersContainer = listItem.querySelector('.passengers');
-        carpool.passengers.forEach(passenger => {
-            const passengerInfo = document.createElement('div');
-            passengerInfo.textContent = `${passenger.name} 📱 ${passenger.contact}`;
-            passengersContainer.appendChild(passengerInfo);
-        });
-
-        // Unirse a un viaje
-        listItem.querySelector('.join-button').addEventListener('click', function () {
-            if (carpool.seats > 0) {
-                const userName = prompt("Ingresa tu nombre:");
-                const userContact = prompt("Ingresa tu número de contacto:");
-
-                if (userName && userContact) {
-                    carpool.seats--;
-                    listItem.querySelector('.seats').textContent = carpool.seats;
-
-                    const newPassenger = { name: userName, contact: userContact };
-                    carpool.passengers.push(newPassenger);
-
-                    const passengerInfo = document.createElement('div');
-                    passengerInfo.textContent = `${userName} 📱 ${userContact}`;
-                    passengersContainer.appendChild(passengerInfo);
-
-                    updateCarpools();
-                } else {
-                    alert('Debes ingresar tu nombre y contacto.');
-                }
-            } else {
-                alert('No hay lugares disponibles.');
-            }
-        });
-
-        // Eliminar un viaje (cualquiera puede eliminarlo)
-        listItem.querySelector('.delete-button').addEventListener('click', function () {
-            const confirmation = confirm("¿Estás seguro de que quieres eliminar este viaje?");
-            if (confirmation) {
-                const carpools = JSON.parse(localStorage.getItem('carpools')) || [];
-                const updatedCarpools = carpools.filter(c => c.contact !== carpool.contact || c.driver !== carpool.driver);
-                localStorage.setItem('carpools', JSON.stringify(updatedCarpools));
-                listItem.remove();
-            }
-        });
-
-        carpoolList.appendChild(listItem);
-    }
-
-    function updateCarpools() {
-        let carpools = [];
-        document.querySelectorAll('#list li').forEach(item => {
-            let [driver, location] = item.textContent.split(' - Desde: ');
-            let seats = parseInt(item.querySelector('.seats').textContent);
-            let passengers = [...item.querySelectorAll('.passengers div')].map(div => {
-                let [name, contact] = div.textContent.split(' 📱 ');
-                return { name, contact };
-            }).filter(p => p.name && p.contact);
+    onValue(ref(database, 'viajes/'), (snapshot) => {
+        viajesList.innerHTML = '';
+        snapshot.forEach((childSnapshot) => {
+            const viaje = childSnapshot.val();
+            const viajeId = childSnapshot.key;
+            const viajeItem = document.createElement('li');
             
-            carpools.push({ driver, location, seats, passengers });
+            viajeItem.innerHTML = `
+    <h3>${viaje.nombre} - ${viaje.salida}</h3>
+    📅 ${viaje.fecha} | ⏰ ${viaje.hora} <br>
+    📞 Contacto: ${viaje.contacto} <br>
+    🚘 Lugares disponibles: <span class="seats">${viaje.lugares}</span> <br>
+    <button class="join-button" onclick="unirseViaje('${viajeId}', ${viaje.lugares})">Unirse ✨</button>
+    <button class="delete-button" onclick="eliminarViaje('${viajeId}')">🗑️ Eliminar</button>
+    <div class="passengers">
+        ${viaje.pasajeros ? viaje.pasajeros.map(p => `👤 ${p.nombre} 📱 ${p.contacto}`).join('<br>') : ''}
+    </div>
+`;
+
+            viajesList.appendChild(viajeItem);
         });
-        localStorage.setItem('carpools', JSON.stringify(carpools));
+    });
+}
+
+// Función para unirse a un viaje
+window.unirseViaje = function (viajeId, lugares) {
+    if (lugares > 0) {
+        const nombrePasajero = prompt("Ingresa tu nombre:");
+        const contactoPasajero = prompt("Ingresa tu número de contacto:");
+
+        if (nombrePasajero && contactoPasajero) {
+            const viajeRef = ref(database, `viajes/${viajeId}`);
+
+            onValue(viajeRef, (snapshot) => {
+                const viaje = snapshot.val();
+                if (!viaje) return;
+
+                // Verificar que aún haya lugares
+                if (viaje.lugares > 0) {
+                    const nuevosPasajeros = viaje.pasajeros ? [...viaje.pasajeros, { nombre: nombrePasajero, contacto: contactoPasajero }] : [{ nombre: nombrePasajero, contacto: contactoPasajero }];
+                    const nuevosLugares = viaje.lugares - 1;
+
+                    update(viajeRef, {
+                        pasajeros: nuevosPasajeros,
+                        lugares: nuevosLugares
+                    });
+                } else {
+                    alert("No hay lugares disponibles.");
+                }
+            }, { onlyOnce: true });
+        } else {
+            alert("Debes ingresar tu nombre y contacto.");
+        }
+    } else {
+        alert("No hay lugares disponibles.");
     }
+};
+
+// Función para eliminar un viaje
+window.eliminarViaje = function (viajeId) {
+    remove(ref(database, 'viajes/' + viajeId));
+};
+
+// Evento de envío del formulario
+document.getElementById("carpoolForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    agregarViaje();
 });
+
+// Cargar viajes al iniciar
+mostrarViajes();
