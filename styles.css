@@ -139,6 +139,7 @@ li {
 
     .offer, .available {
         height: auto; /* Para que en móvil no se vean forzados a una altura fija */
+        padding-right: 30px;
     }
 
     .available {
