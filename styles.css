@@ -28,6 +28,7 @@ body {
 
 .offer {
     margin-bottom: 20px; /* Más espacio debajo del formulario */
+    padding-right: 40px;
 }
 
 .available {
