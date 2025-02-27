@@ -23,17 +23,37 @@ body {
     height: 500px; /* Ambas secciones con la misma altura */
     display: flex;
     flex-direction: column;
+    position: relative; /* Para el indicador de scroll */
 }
 
 .offer {
     margin-bottom: 20px; /* Más espacio debajo del formulario */
-    padding-right: 40px;
 }
 
 .available {
     position: sticky;
-    top: 20px; /* Fijo en la pantalla al hacer scroll */
+    top: 20px;
     overflow-y: auto;
+}
+
+/* Indicador de Scroll en móviles */
+.available::after {
+    content: "⬆️ Desliza para ver más";
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.7;
+}
+
+/* Mayor visibilidad en fecha y hora */
+.date-time {
+    font-weight: bold;
+    color: #C00; /* Rojo Oracle */
+    margin-top: 5px;
 }
 
 h2 {
@@ -115,12 +135,18 @@ li {
     .container {
         grid-template-columns: 1fr;
     }
-    
+
     .offer, .available {
         height: auto; /* Para que en móvil no se vean forzados a una altura fija */
     }
 
     .available {
-        position: relative; /* Para que en móvil no quede fijo */
+        position: relative;
+    }
+
+    /* Aumentar el tamaño del indicador de scroll en móviles */
+    .available::after {
+        font-size: 14px;
+        bottom: 10px;
     }
 }
