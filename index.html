@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carpooling CABA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sección para ofrecer viaje -->
+        <div class="offer">
+            <h2>🚗 Ofrecer un Viaje</h2>
+            <form id="carpoolForm">
+                <input type="text" id="name" placeholder="Tu Nombre" required>
+                <input type="text" id="location" placeholder="Desde donde salis (Ej: Juana Manso 1069)" required>
+                <input type="tel" id="contact" placeholder="Tu Contacto (Teléfono/WhatsApp)" required>
+                <input type="date" id="date" required>
+                <input type="time" id="time" required>
+                <input type="number" id="seats" placeholder="Lugares disponibles" min="1" required>
+                <button type="submit">Publicar Viaje</button>
+            </form>
+        </div>
+
+        <!-- Sección para ver viajes disponibles -->
+        <div class="available">
+            <h2>🛣️ Viajes Disponibles</h2>
+            <ul id="list"></ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
